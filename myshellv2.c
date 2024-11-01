@@ -98,4 +98,16 @@ void parse_and_execute(char *cmd) {
         close(in_fd);
     }
     
+        // Handle output redirection
+    if (output_file != NULL) {
+        int out_fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (out_fd < 0) {
+            perror("Output file error");
+            exit(1);
+        }
+        dup2(out_fd, STDOUT_FILENO);
+        close(out_fd);
+    }
+
+    
     
