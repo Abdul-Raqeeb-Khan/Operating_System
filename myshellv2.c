@@ -109,5 +109,11 @@ void parse_and_execute(char *cmd) {
         close(out_fd);
     }
 
+    // Execute the command
+    if (execvp(args[0], args) < 0) {
+        perror("Exec failed");
+        exit(1);
+    }
+}
     
     
