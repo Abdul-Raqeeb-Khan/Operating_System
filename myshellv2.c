@@ -87,3 +87,15 @@ void parse_and_execute(char *cmd) {
         token = strtok(NULL, " ");
     }
     args[j] = NULL;
+    // Handle input redirection
+    if (input_file != NULL) {
+        int in_fd = open(input_file, O_RDONLY);
+        if (in_fd < 0) {
+            perror("Input file error");
+            exit(1);
+        }
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
+    }
+    
+    
