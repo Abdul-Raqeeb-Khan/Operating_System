@@ -127,3 +127,31 @@ void parse_and_execute(char *cmd) {
         token = strtok(NULL, " ");
     }
     args[j] = NULL;
+    // Handle input redirection
+    if (input_file != NULL) {
+        int in_fd = open(input_file, O_RDONLY);
+        if (in_fd < 0) {
+            perror("Input file error");
+            exit(1);
+        }
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
+    }
+
+    // Handle output redirection
+    if (output_file != NULL) {
+        int out_fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (out_fd < 0) {
+            perror("Output file error");
+            exit(1);
+        }
+        dup2(out_fd, STDOUT_FILENO);
+        close(out_fd);
+    }
+
+    // Execute the command
+    if (execvp(args[0], args) < 0) {
+        perror("Exec failed");
+        exit(1);
+    }
+}
