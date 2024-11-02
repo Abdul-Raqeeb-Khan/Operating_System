@@ -68,3 +68,40 @@ int main() {
 
     return 0;
 }
+
+void execute_command(char *cmd) {
+    char *cmd_parts[MAX_ARGS];
+    int cmd_count = 0;
+
+    // Tokenize commands separated by pipes '|'
+    cmd_parts[cmd_count] = strtok(cmd, "|");
+    while (cmd_parts[cmd_count] != NULL) {
+        cmd_count++;
+        cmd_parts[cmd_count] = strtok(NULL, "|");
+    }
+
+    int i, in_fd = 0;
+
+    for (i = 0; i < cmd_count; i++) {
+        int pipe_fd[2];
+        pipe(pipe_fd);
+
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("Fork failed");
+            exit(1);
+        } else if (pid == 0) {  // Child process
+            dup2(in_fd, STDIN_FILENO);  // Redirect input from previous command
+            if (i < cmd_count - 1) {
+                dup2(pipe_fd[1], STDOUT_FILENO);  // Redirect output to pipe
+            }
+            close(pipe_fd[0]);  // Close unused read end
+            parse_and_execute(cmd_parts[i]);
+            exit(0);
+        } else {  // Parent process
+            wait(NULL);
+            close(pipe_fd[1]);
+            in_fd = pipe_fd[0];
+        }
+    }
+}
