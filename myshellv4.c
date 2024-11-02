@@ -105,3 +105,25 @@ void execute_command(char *cmd) {
         }
     }
 }
+
+
+void parse_and_execute(char *cmd) {
+    char *args[MAX_ARGS];
+    char *input_file = NULL, *output_file = NULL;
+    int j = 0;
+
+    // Tokenize and detect redirection
+    char *token = strtok(cmd, " ");
+    while (token != NULL) {
+        if (strcmp(token, "<") == 0) {
+            token = strtok(NULL, " ");
+            if (token != NULL) input_file = token;
+        } else if (strcmp(token, ">") == 0) {
+            token = strtok(NULL, " ");
+            if (token != NULL) output_file = token;
+        } else {
+            args[j++] = token;
+        }
+        token = strtok(NULL, " ");
+    }
+    args[j] = NULL;
