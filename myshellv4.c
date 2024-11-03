@@ -170,3 +170,16 @@ void add_to_history(char *cmd) {
         history[HISTORY_SIZE - 1] = strdup(cmd); // Add new command
     }
 }
+
+void print_history() {
+    for (int i = 0; i < history_count; i++) {
+        printf("%d %s\n", i + 1, history[i]);
+    }
+}
+
+void execute_from_history(int index) {
+    if (index >= 0 && index < history_count) {
+        printf("Executing: %s\n", history[index]);
+        execute_command(history[index]);
+    }
+}
