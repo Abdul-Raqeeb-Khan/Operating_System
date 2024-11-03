@@ -1,3 +1,5 @@
+/*Version 4
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -153,5 +155,18 @@ void parse_and_execute(char *cmd) {
     if (execvp(args[0], args) < 0) {
         perror("Exec failed");
         exit(1);
+    }
+}
+
+void add_to_history(char *cmd) {
+    if (history_count < HISTORY_SIZE) {
+        history[history_count] = strdup(cmd);
+        history_count++;
+    } else {
+        free(history[0]); // Free the oldest command
+        for (int i = 1; i < HISTORY_SIZE; i++) {
+            history[i - 1] = history[i]; // Shift commands up
+        }
+        history[HISTORY_SIZE - 1] = strdup(cmd); // Add new command
     }
 }
